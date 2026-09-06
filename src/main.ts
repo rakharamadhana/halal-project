@@ -29,6 +29,7 @@ import { scheduleBannerUpdate } from '@/plugins/admob'
 import { initSafeArea } from "@/plugins/safeArea";
 import { initRevenueCat } from '@/plugins/RevenueCat';
 import { Purchases } from '@revenuecat/purchases-capacitor';
+import { syncScanWidget } from '@/composables/useWidgetSync';
 
 // ✅ unified user profile composable
 import {
@@ -416,12 +417,14 @@ supabase.auth.onAuthStateChange(async (event, session) => {
         syncOneSignalUser(null).catch(console.warn)
         resetUserProfileState()
         currentUser.value = null
+        syncScanWidget({ loggedIn: false }).catch(() => {})
         router.replace('/login')
         return
     }
 
     if (session?.user) {
         currentUser.value = session.user
+        syncScanWidget({ loggedIn: true }).catch(() => {})
     }
 
     if (event === 'SIGNED_IN' && session?.user) {

@@ -119,16 +119,20 @@ async function fetchPersonalNotifications() {
     return
   }
 
+  // Only unread items show in the Activity feed — once read, users have
+  // ProfileView's own submission history to look things up, so read
+  // notifications don't need to linger here.
   const { data, error } = await supabase
     .from('notifications')
     .select('*')
     .eq('user_id', session.user.id)
+    .eq('is_read', false)
     .order('created_at', { ascending: false })
     .limit(50)
 
   if (!error && data) {
     personalNotifications.value = data as AppNotification[]
-    unreadPersonalCount.value = data.filter(n => !n.is_read).length
+    unreadPersonalCount.value = data.length
   }
   recomputeHasUnread()
 }
@@ -211,9 +215,9 @@ async function markCategorySeen(category: BroadcastCategory) {
 }
 
 async function markRead(id: string) {
-  const notif = personalNotifications.value.find(n => n.id === id)
-  if (!notif || notif.is_read) return
-  notif.is_read = true
+  const index = personalNotifications.value.findIndex(n => n.id === id)
+  if (index === -1) return
+  personalNotifications.value.splice(index, 1)
   unreadPersonalCount.value = Math.max(0, unreadPersonalCount.value - 1)
   recomputeHasUnread()
   await supabase.from('notifications').update({ is_read: true }).eq('id', id)
@@ -222,7 +226,7 @@ async function markRead(id: string) {
 async function markAllPersonalRead() {
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) return
-  personalNotifications.value.forEach(n => { n.is_read = true })
+  personalNotifications.value = []
   unreadPersonalCount.value = 0
   recomputeHasUnread()
   await supabase.from('notifications').update({ is_read: true }).eq('user_id', session.user.id).eq('is_read', false)

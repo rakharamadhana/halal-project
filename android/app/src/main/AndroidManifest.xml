@@ -75,6 +75,78 @@
             </intent-filter>
         </activity>
 
+        <receiver
+            android:name=".QuickActionsWidgetProviderLight"
+            android:exported="false"
+            android:label="@string/widget_quick_actions_light_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_quick_actions_light_info" />
+        </receiver>
+
+        <receiver
+            android:name=".QuickActionsWidgetProviderDark"
+            android:exported="false"
+            android:label="@string/widget_quick_actions_dark_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_quick_actions_dark_info" />
+        </receiver>
+
+        <receiver
+            android:name=".QuickActionsWidgetProviderLight2x"
+            android:exported="false"
+            android:label="@string/widget_quick_actions_light_2x_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_quick_actions_light_2x_info" />
+        </receiver>
+
+        <receiver
+            android:name=".QuickActionsWidgetProviderDark2x"
+            android:exported="false"
+            android:label="@string/widget_quick_actions_dark_2x_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_quick_actions_dark_2x_info" />
+        </receiver>
+
+        <receiver
+            android:name=".QuickActionsWidgetProviderLight3x"
+            android:exported="false"
+            android:label="@string/widget_quick_actions_light_3x_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_quick_actions_light_3x_info" />
+        </receiver>
+
+        <receiver
+            android:name=".QuickActionsWidgetProviderDark3x"
+            android:exported="false"
+            android:label="@string/widget_quick_actions_dark_3x_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_quick_actions_dark_3x_info" />
+        </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

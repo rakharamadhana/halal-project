@@ -674,6 +674,7 @@ import { onIonViewDidEnter } from '@ionic/vue'
 import { useAutoScanStore } from '@/composables/useAutoScanStore'
 import { useNotifier } from "@/composables/useNotifier"
 import { useI18n } from 'vue-i18n'
+import { syncScanWidget } from '@/composables/useWidgetSync'
 
 const { t } = useI18n()
 
@@ -789,6 +790,16 @@ const ocrStartTime = ref<number | null>(null)
 // @ts-expect-error – injected global
 const appVersion = __APP_VERSION__;
 const todayScanCount = ref(0)
+
+// Keep the home screen widget's "scans left today" line in sync.
+watch([todayScanCount, bonusScans, isDonor], ([count, bonus, donor]) => {
+  syncScanWidget({
+    loggedIn: true,
+    unlimited: donor,
+    remaining: DAILY_SCAN_LIMIT + bonus - count,
+  }).catch(() => {})
+})
+
 const loadingReflection = ref<any>(null)
 const scanMode = ref<'manual' | 'auto'>('manual')
 
