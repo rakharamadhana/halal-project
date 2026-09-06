@@ -105,6 +105,9 @@
           <ion-card-title>{{ $t('credits.poweredBy') }}</ion-card-title>
         </ion-card-header>
         <ion-card-content>
+          <div class="powered-by-logo-wrapper" @click="openYiQiWebsite">
+            <img src="/social-logo/yiqi-logo.png" alt="YiQi Global Consulting Logo" class="powered-by-logo" />
+          </div>
           <p class="powered-by-name clickable-contributor" @click="openYiQiWebsite">
             YiQi Global Consulting (藝啟文創行銷有限公司) <ion-icon :icon="sparkles" class="link-spark" />
           </p>
@@ -311,6 +314,18 @@ ion-card-content li {
 
 .logo-img {
   max-width: 160px;   /* adjust size as needed */
+  height: auto;
+}
+
+.powered-by-logo-wrapper {
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.powered-by-logo {
+  max-width: 120px;
   height: auto;
 }
 
