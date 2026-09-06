@@ -142,7 +142,8 @@ ion-tabs > ion-router-outlet {
   margin: 0;
   padding: 6px;
   height: 64px;
-  border-radius: 32px;
+  border-radius: 999px;
+  overflow: hidden;
   border: 1px solid var(--card-border);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
   display: flex;
@@ -154,7 +155,9 @@ ion-tabs > ion-router-outlet {
 ion-tab-button {
   --padding-top: 0;
   --padding-bottom: 0;
-  flex: 0 0 auto;
+  --padding-start: 0;
+  --padding-end: 0;
+  flex: 1 1 0;
   width: auto;
   margin: 0;
 }
@@ -172,8 +175,6 @@ ion-tab-button {
 }
 
 ion-tab-button.tab-selected .tab-content {
-  flex-direction: row;
-  gap: 6px;
   transform: translateY(-1px);
 }
 
@@ -199,10 +200,6 @@ ion-tab-button ion-label {
   display: none;
 }
 
-ion-tab-button.tab-selected ion-label {
-  display: block;
-  margin-top: 0;
-}
 
 .tab-dot {
   box-sizing: border-box;
