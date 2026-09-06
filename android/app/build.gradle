@@ -1,9 +1,13 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
     namespace = "com.rcreative.halalformosa"
     compileSdk = rootProject.ext.compileSdkVersion
     ndkVersion = rootProject.ext.ndkVersion
+    kotlinOptions {
+        jvmTarget = "21"
+    }
     defaultConfig {
         applicationId = "com.rcreative.halalformosa"
         minSdkVersion = rootProject.ext.minSdkVersion
@@ -39,6 +43,8 @@ dependencies {
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')
+    implementation "com.google.android.recaptcha:recaptcha:18.9.3"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0"
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
