@@ -46,6 +46,16 @@
       </ion-popover>
     </ion-buttons>
 
+    <!-- Notifications bell (optional, follows showProfile unless overridden) -->
+    <ion-buttons slot="end" v-if="isAuthenticated && showNotifications && showProfile">
+      <ion-button fill="clear" class="header-notif-button" @click="navigateToNotifications">
+        <div class="header-notif-icon-wrapper">
+          <ion-icon :icon="notificationsOutline" />
+          <div v-if="totalUnreadCount > 0" class="header-notif-badge">{{ totalUnreadCount > 9 ? '9+' : totalUnreadCount }}</div>
+        </div>
+      </ion-button>
+    </ion-buttons>
+
     <!-- Profile button (optional) -->
     <ion-buttons slot="end" v-if="showProfile">
       <ion-button fill="clear" @click="navigateToProfile" class="profile-button">
@@ -66,8 +76,9 @@
 import { ref, onMounted } from 'vue'
 import { IonToolbar, IonButton, IonTitle, IonButtons, IonIcon, IonBackButton, IonPopover, IonList, IonContent, isPlatform } from '@ionic/vue'
 import { useRouter } from 'vue-router'
-import {arrowBackOutline, ellipsisVerticalOutline, personCircle} from 'ionicons/icons'
+import {arrowBackOutline, ellipsisVerticalOutline, personCircle, notificationsOutline} from 'ionicons/icons'
 import { supabase } from '@/plugins/supabaseClient'
+import { useNotifications } from '@/composables/useNotifications'
 
 withDefaults(defineProps<{
   title: string
@@ -75,6 +86,7 @@ withDefaults(defineProps<{
   showBack?: boolean
   backRoute?: string
   showProfile?: boolean
+  showNotifications?: boolean
   useRouterBack?: boolean
   transparent?: boolean
   contrast?: boolean
@@ -83,17 +95,24 @@ withDefaults(defineProps<{
   useRouterBack: true,
   transparent: false,
   contrast: false,
-  centerTitle: false
+  centerTitle: false,
+  showNotifications: true
 })
 
 const isAuthenticated = ref(false)
 const profilePic = ref<string | null>(null)
 const isIos = ref(isPlatform('ios'))
 const router = useRouter()
+const { totalUnreadCount } = useNotifications()
 
 function navigateToProfile() {
   if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
   router.push('/profile')
+}
+
+function navigateToNotifications() {
+  if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
+  router.push('/notifications')
 }
 
 async function checkSession() {
@@ -102,8 +121,8 @@ async function checkSession() {
   profilePic.value = session?.user?.user_metadata?.avatar_url || null
 }
 
-onMounted(() => {
-  checkSession()
+onMounted(async () => {
+  await checkSession()
   supabase.auth.onAuthStateChange((_event, session) => {
     isAuthenticated.value = !!session
     profilePic.value = session?.user?.user_metadata?.avatar_url || null
@@ -182,6 +201,31 @@ onMounted(() => {
   border-radius: 50%;
 }
 
+/* Bare bell icon, no circular chip behind it (matches the unauthenticated
+   profile placeholder icon, which also has no background box). */
+:deep(.header-notif-button) {
+  --background: transparent !important;
+  --background-hover: transparent !important;
+  --background-activated: transparent !important;
+  --background-focused: transparent !important;
+  --box-shadow: none !important;
+  --padding-start: 0 !important;
+  --padding-end: 0 !important;
+  width: 38px !important;
+  min-width: 38px !important;
+  max-width: 38px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+:deep(.header-notif-button) ion-icon {
+  font-size: 24px;
+  color: var(--ion-text-color);
+}
+
 :deep(.custom-back-button.contrast),
 :deep(.header-action-button.contrast) {
   --background: rgba(0, 0, 0, 0.28);
@@ -234,6 +278,34 @@ onMounted(() => {
 .profile-placeholder {
   font-size: 38px;
   color: var(--ion-color-medium);
+}
+
+.header-notif-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-notif-badge {
+  box-sizing: border-box;
+  position: absolute;
+  top: -9px;
+  right: -10px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--ion-color-danger);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  border-radius: 999px;
+  border: 2px solid var(--card-bg);
+  box-shadow: 0 0 5px rgba(var(--ion-color-danger-rgb), 0.5);
 }
 
 /* Dark Mode Overrides */

@@ -3294,7 +3294,7 @@ button.gm-ui-hover-effect > span {
 }
 
 .header-btn {
-  --border-radius: var(--radius-lg);
+  --border-radius: 50%;
   height: 46px !important;
   width: 46px !important;
   min-height: 46px !important;

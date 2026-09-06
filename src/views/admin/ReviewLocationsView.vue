@@ -349,7 +349,7 @@ import {
   IonButton, IonInput, IonTextarea, IonSkeletonText, IonSelect, IonSelectOption,
   IonSearchbar, IonSegment, IonSegmentButton, IonPopover, IonIcon,
   IonItemDivider, IonChip, IonCheckbox, toastController,
-  IonCard, IonListHeader
+  IonCard, IonListHeader, alertController
 } from '@ionic/vue'
 
 import { ref, onMounted, reactive, computed } from 'vue'
@@ -462,7 +462,7 @@ const filteredLocations = computed(() => {
 
   // View Mode Filter
   if (viewMode.value === 'pending') {
-    result = result.filter(loc => !loc.approved && !loc.is_archived)
+    result = result.filter(loc => !loc.approved && !loc.is_archived && !loc.is_rejected)
   } else {
     result = result.filter(loc => loc.is_archived)
   }
@@ -709,15 +709,46 @@ async function restoreLocation(id: number) {
 }
 
 async function rejectLocation(id: number) {
-  if (!confirm(t('admin.confirmDeletePlace'))) return
-  
-  await supabase
-      .from('locations')
-      .delete()
-      .eq('id', id)
+  const alert = await alertController.create({
+    header: t('review.confirmRejectHeader', 'Reject Submission'),
+    message: t('review.confirmRejectMsg', 'Please provide a reason for rejecting this submission:'),
+    inputs: [
+      {
+        name: 'reason',
+        type: 'textarea',
+        placeholder: t('review.reasonPlaceholder', 'e.g. Duplicate listing, incorrect location, not halal-relevant...')
+      }
+    ],
+    buttons: [
+      { text: t('common.cancel', 'Cancel'), role: 'cancel' },
+      {
+        text: t('review.reject', 'Reject'),
+        handler: async (data) => {
+          if (!data.reason || !data.reason.trim()) {
+            alert.message = t('review.reasonRequired', 'A reason is required to reject the submission.');
+            return false // Keep alert open
+          }
 
-  closeModal()
-  await loadPendingLocations()
+          const { error } = await supabase
+              .from('locations')
+              .update({
+                approved: false,
+                is_rejected: true,
+                rejection_reason: data.reason.trim()
+              })
+              .eq('id', id)
+
+          if (!error) {
+            closeModal()
+            await loadPendingLocations()
+          } else {
+            console.error('Error rejecting location:', error)
+          }
+        }
+      }
+    ]
+  })
+  await alert.present()
 }
 
 onMounted(() => {

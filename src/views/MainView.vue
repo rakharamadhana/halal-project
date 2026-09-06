@@ -9,7 +9,7 @@
           <div class="tab-content">
             <div class="tab-icon-wrapper">
               <ion-icon :icon="homeOutline" />
-              <div v-if="isAuthenticated && !claimedBonus" class="tab-dot"></div>
+              <div v-if="isAuthenticated && homeBadgeCount > 0" class="tab-dot">{{ homeBadgeCount > 9 ? '9+' : homeBadgeCount }}</div>
             </div>
             <ion-label>{{ $t('main.home') }}</ion-label>
           </div>
@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import {
   IonTabBar, IonTabButton, IonTabs, IonLabel, IonIcon, IonRouterOutlet, IonPage
 } from '@ionic/vue'
@@ -68,8 +68,18 @@ import {
 } from 'ionicons/icons'
 import { supabase } from '@/plugins/supabaseClient'
 import { useDailyMissions } from '@/composables/useDailyMissions'
+import { useNotifications } from '@/composables/useNotifications'
 
-const { claimedBonus, fetchProgress } = useDailyMissions()
+const { missions, allCompleted, claimedBonus, fetchProgress } = useDailyMissions()
+const { totalUnreadCount } = useNotifications()
+
+// Everything the user has yet to check on Home: unread notifications, plus
+// missions still to complete (and the bonus, once earned but unclaimed).
+const homeBadgeCount = computed(() => {
+  const missionsLeft = missions.value.filter(m => !m.completed).length
+    + (allCompleted.value && !claimedBonus.value ? 1 : 0)
+  return totalUnreadCount.value + missionsLeft
+})
 
 const isAuthenticated = ref(false)
 const profilePic = ref<string | null>(null)
@@ -162,7 +172,8 @@ ion-tab-button {
 }
 
 ion-tab-button.tab-selected .tab-content {
-  background: rgba(var(--ion-color-carrot-rgb), 0.14);
+  flex-direction: row;
+  gap: 6px;
   transform: translateY(-1px);
 }
 
@@ -185,16 +196,31 @@ ion-tab-button ion-label {
   font-size: 10.5px;
   font-weight: 600;
   margin-top: 3px;
+  display: none;
+}
+
+ion-tab-button.tab-selected ion-label {
+  display: block;
+  margin-top: 0;
 }
 
 .tab-dot {
+  box-sizing: border-box;
   position: absolute;
-  top: -2px;
-  right: 2px;
-  width: 8px;
-  height: 8px;
+  top: -9px;
+  right: -8px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: var(--ion-color-danger);
-  border-radius: 50%;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  border-radius: 999px;
   border: 2px solid var(--card-bg);
   box-shadow: 0 0 5px rgba(var(--ion-color-danger-rgb), 0.5);
   z-index: 10001; /* Stay above ion-modal sheet */

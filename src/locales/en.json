@@ -692,6 +692,26 @@
     "placeholder": "Search news...",
     "loadingMoreNews": "Loading more news..."
   },
+  "notifications": {
+    "title": "Notifications",
+    "activity": "Activity",
+    "whatsNew": "What's new",
+    "markAllRead": "Mark all read",
+    "empty": "No notifications yet",
+    "emptyHint": "We'll let you know when something new happens.",
+    "category": {
+      "products": "New products added",
+      "locations": "New places added",
+      "news": "New announcements",
+      "trips": "New trips available",
+      "store": "New store items",
+      "productsSingle": "New product",
+      "locationsSingle": "New place",
+      "newsSingle": "New announcement",
+      "tripsSingle": "New trip",
+      "storeSingle": "New store item"
+    }
+  },
   "settings": {
     "title": "Settings",
     "appearance": "Appearance",

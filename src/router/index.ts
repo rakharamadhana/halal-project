@@ -103,6 +103,12 @@ const routes: Array<RouteRecordRaw> = [
         meta: { requiresAuth: true, noTabs: true, noAds: true }
     },
     {
+        path: '/notifications',
+        name: 'Notifications',
+        component: () => import('@/views/notifications/NotificationsView.vue'),
+        meta: { requiresAuth: true, noTabs: true, noAds: true }
+    },
+    {
         path: '/submissions/products',
         name: 'MyProducts',
         component: () => import('@/views/profile/MyProductsView.vue'),

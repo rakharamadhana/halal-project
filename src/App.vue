@@ -151,6 +151,7 @@ import { navigateOutline } from 'ionicons/icons';
 import { onMounted, ref, computed } from 'vue';
 import { performBotChecks, isBotDetected } from '@/utils/botShield';
 import { initInteractionMonitor } from '@/utils/interactionShield';
+import { useNotifications } from '@/composables/useNotifications';
 
 
 import { Analytics } from "@vercel/analytics/vue";
@@ -445,6 +446,9 @@ onMounted(async () => {
   // 🛡️ Perform Bot Defense checks on mount
   performBotChecks();
 
+  const { initNotifications, refreshAll: refreshNotifications } = useNotifications();
+  if (currentUser.value?.id) initNotifications();
+
   initTheme();
   await askGeolocationPermission();
   await checkAppUpdate();
@@ -463,6 +467,7 @@ onMounted(async () => {
         updateLastSeen();
       }
       startProximityTracking();
+      if (currentUser.value?.id) refreshNotifications();
     } else {
       // Foreground-only by design: the app holds no background location
       // permission, so Android suspends the watcher anyway. Stopping here also
@@ -482,6 +487,9 @@ onMounted(async () => {
     if (event === 'PASSWORD_RECOVERY') {
       console.log('🔄 Password recovery event detected. Redirecting...');
       router.push('/update-password');
+    }
+    if (event === 'SIGNED_IN') {
+      initNotifications();
     }
   });
 });

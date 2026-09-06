@@ -14,7 +14,7 @@
           class="view-all-btn"
         >
           {{ $t('dailyMissions.viewAll') }}
-          <div v-if="!claimedBonus" class="red-dot"></div>
+          <div v-if="remainingCount > 0" class="red-dot">{{ remainingCount > 9 ? '9+' : remainingCount }}</div>
         </ion-button>
       </div>
     </ion-card-header>
@@ -165,7 +165,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
   IonIcon, IonButton, IonModal,
@@ -182,6 +182,13 @@ import { useDailyMissions } from '@/composables/useDailyMissions'
 const showModal = ref(false)
 const { missions, loading, claimedBonus, allCompleted, fetchProgress, checkAndAwardBonus } = useDailyMissions()
 const router = useRouter()
+
+// Missions still to complete, plus the bonus itself once every mission is
+// done but the bonus hasn't been claimed yet.
+const remainingCount = computed(() => {
+  const incomplete = missions.value.filter(m => !m.completed).length
+  return incomplete + (allCompleted.value && !claimedBonus.value ? 1 : 0)
+})
 
 const navigateToMission = (id: string) => {
   showModal.value = false
@@ -393,13 +400,22 @@ onIonViewWillEnter(() => {
 }
 
 .red-dot {
+  box-sizing: border-box;
   position: absolute;
-  top: -2px;
-  right: -4px;
-  width: 9px;
-  height: 9px;
+  top: -9px;
+  right: -10px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: var(--ion-color-danger);
-  border-radius: 50%;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  border-radius: 999px;
   border: 2px solid var(--ion-card-background, #fff);
   box-shadow: 0 0 5px rgba(var(--ion-color-danger-rgb), 0.5);
   z-index: 10;

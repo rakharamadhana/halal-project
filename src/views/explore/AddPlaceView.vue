@@ -46,6 +46,15 @@
 
     <ion-content class="ion-padding">
 
+      <!-- Rejection Reason Banner -->
+      <div v-if="rejectionInfo" class="rejection-banner">
+        <ion-icon :icon="closeCircleOutline" class="rejection-banner-icon" />
+        <div class="rejection-banner-text">
+          <strong>This submission was rejected</strong>
+          <p>{{ rejectionInfo }}</p>
+        </div>
+      </div>
+
       <!-- Limit Reached Block Card -->
       <div v-if="limitReached && !isEditing" class="limit-reached-container animate__animated animate__fadeIn" style="display: flex; align-items: center; justify-content: center; height: 100%; min-height: 350px;">
         <ion-card style="margin: 0; box-shadow: none; border: 1px solid var(--ion-color-light); border-radius: 12px; text-align: center; max-width: 400px; width: 100%;" class="ion-padding">
@@ -568,7 +577,8 @@ import {
     addCircleOutline,
     alertCircleOutline,
     warningOutline,
-    lockClosedOutline
+    lockClosedOutline,
+    closeCircleOutline
 } from 'ionicons/icons'
 import {Capacitor} from '@capacitor/core'
 import {Geolocation} from '@capacitor/geolocation'
@@ -581,6 +591,7 @@ import { awardScanBonus, isContributionLimitReached } from '@/composables/useSca
 
 const route = useRoute()
 const isEditing = computed(() => !!route.params.id)
+const rejectionInfo = ref<string | null>(null)
 const coordUpdateSource = ref<'address' | 'map' | 'manual' | 'init' | null>('init')
 
 const limitReached = ref(false)
@@ -1510,6 +1521,10 @@ const submitPlace = async () => {
         payload.approved = false
         payload.approved_by = null
         payload.approved_at = null
+        // Resubmitting after a rejection clears the flag so it reappears in
+        // the admin's pending queue instead of staying excluded as rejected.
+        payload.is_rejected = false
+        payload.rejection_reason = null
       }
     }
 
@@ -1683,12 +1698,16 @@ onMounted(async () => {
     price_range,
     opening_hours,
     tags,
-    approved
+    approved,
+    is_rejected,
+    rejection_reason
   `)
         .eq('id', route.params.id)
         .maybeSingle()
 
     if (!error && data) {
+      rejectionInfo.value = data.is_rejected ? data.rejection_reason : null
+
       form.value = {
         name: data.name,
         type_id: data.type_id,
@@ -1780,6 +1799,38 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.rejection-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(var(--ion-color-danger-rgb), 0.1);
+  border: 1px solid rgba(var(--ion-color-danger-rgb), 0.3);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.rejection-banner-icon {
+  font-size: 20px;
+  color: var(--ion-color-danger);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.rejection-banner-text strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--ion-color-danger);
+  margin-bottom: 2px;
+}
+
+.rejection-banner-text p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ion-text-color);
+  line-height: 1.4;
+}
+
 .form :deep(.ion-invalid) {
   --highlight-color-invalid: var(--ion-color-danger);
 }

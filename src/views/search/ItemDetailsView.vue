@@ -1399,6 +1399,12 @@ async function loadProductData() {
 onIonViewWillEnter(async () => {
   await loadProductData()
   auditLogRef.value?.fetchLogs()
+
+  // Deep-linked here from a rejection notification to fix and resubmit.
+  if (route.query.edit === 'true' && canEdit.value) {
+    showEditModal.value = true
+    router.replace({ path: route.path, query: {} })
+  }
 })
 
 

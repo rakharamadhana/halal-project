@@ -38,6 +38,15 @@
     </ion-header>
 
     <ion-content ref="contentRef" class="ion-padding" >
+      <!-- Rejection Reason Banner -->
+      <div v-if="props.editProduct?.is_rejected" class="rejection-banner">
+        <ion-icon :icon="closeCircleOutline" class="rejection-banner-icon" />
+        <div class="rejection-banner-text">
+          <strong>This submission was rejected</strong>
+          <p>{{ props.editProduct.rejection_reason }}</p>
+        </div>
+      </div>
+
       <!-- Limit Reached Block Card -->
       <div v-if="limitReached && !props.editProduct" class="limit-reached-container animate__animated animate__fadeIn" style="display: flex; align-items: center; justify-content: center; height: 100%; min-height: 350px;">
         <ion-card style="margin: 0; box-shadow: none; border: 1px solid var(--ion-color-light); border-radius: 12px; text-align: center; max-width: 400px; width: 100%;" class="ion-padding">
@@ -966,7 +975,8 @@ import {
   trashOutline,
   refreshOutline,
   chevronForwardOutline,
-  lockClosedOutline
+  lockClosedOutline,
+  closeCircleOutline
 } from 'ionicons/icons';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -2687,6 +2697,38 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.rejection-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(var(--ion-color-danger-rgb), 0.1);
+  border: 1px solid rgba(var(--ion-color-danger-rgb), 0.3);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.rejection-banner-icon {
+  font-size: 20px;
+  color: var(--ion-color-danger);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.rejection-banner-text strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--ion-color-danger);
+  margin-bottom: 2px;
+}
+
+.rejection-banner-text p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ion-text-color);
+  line-height: 1.4;
+}
+
 ion-toast {
   transform: translateY(-55px);
 }
